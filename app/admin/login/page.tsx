@@ -6,6 +6,7 @@ import { authAPI } from "@/lib/admin/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { Input } from "@/components/admin/ui/input";
 import { Button } from "@/components/admin/ui/button";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,14 +25,18 @@ export default function LoginPage() {
 
       if (response.success && response.data.token) {
         // Token is already saved in authAPI.login
-        alert("लॉगिन यशस्वी!");
+        toast.success("लॉगिन यशस्वी!");
         router.push("/admin/dashboard");
       } else {
-        setError("लॉगिन अयशस्वी. कृपया पुन्हा प्रयत्न करा.");
+        const msg = "लॉगिन अयशस्वी. कृपया पुन्हा प्रयत्न करा.";
+        setError(msg);
+        toast.error(msg);
       }
     } catch (err: any) {
       console.error("Login error:", err);
-      setError(err.message || "लॉगिन करताना त्रुटी आली");
+      const msg = err.message || "लॉगिन करताना त्रुटी आली";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

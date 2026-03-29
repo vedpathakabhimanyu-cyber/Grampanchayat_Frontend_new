@@ -12,6 +12,9 @@ import {
   SelectValue,
 } from "@/components/admin/ui/select";
 import { usersAPI } from "@/lib/admin/api";
+import { toast } from "sonner";
+
+import { ADMIN_TASKS } from "@/lib/admin/tasks";
 
 interface User {
   id: string;
@@ -23,17 +26,7 @@ interface User {
   created_at: string;
 }
 
-const allTasks = [
-  { id: "task1", name: "मूलभूत माहिती" },
-  { id: "task2", name: "दस्तऐवज" },
-  { id: "task3", name: "प्रमाणपत्रे" },
-  { id: "task4", name: "ईमेल पडताळणी" },
-  { id: "task5", name: "पायाभूत सुविधा" },
-  { id: "task6", name: "ऐतिहासिक माहिती" },
-  { id: "task7", name: "ग्रामपंचायत माहिती" },
-  { id: "task8", name: "घोषणा" },
-  { id: "task9", name: "हिरो इमेज" },
-];
+const allTasks = ADMIN_TASKS;
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -68,7 +61,7 @@ export default function UserManagementPage() {
   const handleCreateUser = async () => {
     try {
       if (!formData.email || !formData.password) {
-        alert("कृपया ईमेल आणि पासवर्ड भरा");
+        toast.error("कृपया ईमेल आणि पासवर्ड भरा");
         return;
       }
 
@@ -81,7 +74,7 @@ export default function UserManagementPage() {
       });
 
       if (response.success) {
-        alert("वापरकर्ता यशस्वीरित्या तयार केला");
+        toast.success("वापरकर्ता यशस्वीरित्या तयार केला");
         setShowCreateForm(false);
         setFormData({
           email: "",
@@ -91,11 +84,11 @@ export default function UserManagementPage() {
         });
         fetchUsers();
       } else {
-        alert(response.message || "Error creating user");
+        toast.error(response.message || "Error creating user");
       }
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("वापरकर्ता तयार करताना त्रुटी");
+      toast.error("वापरकर्ता तयार करताना त्रुटी");
     }
   };
 
@@ -114,15 +107,15 @@ export default function UserManagementPage() {
       });
 
       if (response.success) {
-        alert("वापरकर्ता अद्यतनित केला");
+        toast.success("वापरकर्ता अद्यतनित केला");
         setEditingUser(null);
         fetchUsers();
       } else {
-        alert(response.message || "Error updating user");
+        toast.error(response.message || "Error updating user");
       }
     } catch (error) {
       console.error("Error updating user:", error);
-      alert("वापरकर्ता अद्यतनित करताना त्रुटी");
+      toast.error("वापरकर्ता अद्यतनित करताना त्रुटी");
     }
   };
 
@@ -134,14 +127,14 @@ export default function UserManagementPage() {
     try {
       const response = await usersAPI.delete(userId);
       if (response.success) {
-        alert("वापरकर्ता हटवला");
+        toast.success("वापरकर्ता हटवला");
         fetchUsers();
       } else {
-        alert(response.message || "Error deleting user");
+        toast.error(response.message || "Error deleting user");
       }
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert("वापरकर्ता हटवताना त्रुटी");
+      toast.error("वापरकर्ता हटवताना त्रुटी");
     }
   };
 

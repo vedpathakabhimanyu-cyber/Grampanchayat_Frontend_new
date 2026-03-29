@@ -6,89 +6,24 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/admin/ui/
 import { Button } from "@/components/admin/ui/button";
 import { useRouter } from "next/navigation";
 import { usePermissions } from "@/contexts/admin/PermissionContext";
+import { ADMIN_TASKS } from "@/lib/admin/tasks";
 
 type TaskCompletion = { [key: string]: number };
-type TaskInfo = { name: string; description: string };
-
-// Add Task3 info
-const TASK_INFO: { [key: string]: TaskInfo } = {
-  task1: {
-    name: "मूलभूत माहिती",
-    description: "मूलभूत माहिती भरा.",
-  },
-  task2: {
-    name: "मुख्य आकडेवारी",
-    description: "लोकसंख्या, साक्षरता आणि इतर महत्त्वाची आकडेवारी भरा.",
-  },
-  task3: {
-    name: "प्रमाणपत्र तपशील",
-    description: "प्रमाणपत्रे व आवश्यक कागदपत्रे जोडा.",
-  },
-  task4: {
-    name: "फोटो गॅलरी",
-    description: "गावातील विकासकामे आणि विशेष स्थळांच्या प्रतिमा अपलोड करा.",
-  },
-  task5: {
-    name: "पायाभूत सुविधा",
-    description: "पायाभूत सुविधांची माहिती भरा.",
-  },
-  task6: {
-    name: "ऐतिहासिक माहिती",
-    description: "ऐतिहासिक घटना आणि स्थळे जोडा.",
-  },
-  task7: {
-    name: "ग्रामपंचायत तपशील",
-    description: "ग्रामपंचायतीचे संपर्क आणि स्थानाची माहिती जोडा.",
-  },
-  task8: {
-    name: "परिपत्रक / घोषणा व्यवस्थापन",
-    description: "जाहिराती व परिपत्रके अपलोड करा.",
-  },
-  task9: {
-    name: "मुख्य प्रतिमा",
-    description: "मुख्यपृष्ठासाठी हिरो स्लायडर प्रतिमा अपलोड करा.",
-  },
-  task10: {
-    name: "कर भरणी",
-    description: "QR कोड आणि बँक तपशील व्यवस्थापित करा.",
-  },
-  task11: {
-    name: "प्रकल्प / काम",
-    description: "ग्रामपंचायतीचे प्रकल्प आणि कामांची माहिती व्यवस्थापित करा.",
-  },
-};
 
 function DashboardContent() {
   const router = useRouter();
   const { hasPermission, loading: permissionsLoading, user } = usePermissions();
-  const [taskCompletion, setTaskCompletion] = useState<TaskCompletion>({
-    task1: 0,
-    task2: 0,
-    task3: 0,
-    task4: 0,
-    task5: 0,
-    task6: 0,
-    task7: 0,
-    task8: 0,
-    task9: 0,
-    task10: 0,
-    task11: 0,
-  });
+  
+  // Initialize from centralized tasks
+  const [taskCompletion, setTaskCompletion] = useState<TaskCompletion>(
+    ADMIN_TASKS.reduce((acc, task) => ({ ...acc, [task.id]: 0 }), {})
+  );
 
   const computeProgress = useCallback(() => {
-    const newTaskCompletion: TaskCompletion = {
-      task1: 0,
-      task2: 0,
-      task3: 0,
-      task4: 0,
-      task5: 0,
-      task6: 0,
-      task7: 0,
-      task8: 0,
-      task9: 0,
-      task10: 0,
-      task11: 0,
-    };
+    const newTaskCompletion: TaskCompletion = ADMIN_TASKS.reduce(
+      (acc, task) => ({ ...acc, [task.id]: 0 }), 
+      {}
+    );
 
     try {
       // Task1
@@ -194,16 +129,15 @@ function DashboardContent() {
         newTaskCompletion.task8 = 0;
       }
 
-      // Task9 - Hero Images
+      // Task9
       const task9Data = JSON.parse(localStorage.getItem("task9") || "[]");
       if (Array.isArray(task9Data) && task9Data.length > 0) {
-        // Progress based on number of images (max 3)
         newTaskCompletion.task9 = (task9Data.length / 3) * 100;
       } else {
         newTaskCompletion.task9 = 0;
       }
 
-      // Task10 - Tax Payment
+      // Task10
       const task10Data = JSON.parse(localStorage.getItem("task10") || "{}");
       if (Object.keys(task10Data).length > 0) {
         newTaskCompletion.task10 = 100;
@@ -211,7 +145,7 @@ function DashboardContent() {
         newTaskCompletion.task10 = 0;
       }
 
-      // Task11 - Projects
+      // Task11
       const task11Data = JSON.parse(localStorage.getItem("task11") || "[]");
       if (Array.isArray(task11Data) && task11Data.length > 0) {
         newTaskCompletion.task11 = 100;
@@ -233,31 +167,18 @@ function DashboardContent() {
     return () => window.removeEventListener("taskUpdate", handleTaskUpdate);
   }, [computeProgress]);
 
-  const goToTask = (taskNumber: number) => {
-    const routes: Record<number, string> = {
-      1: "/admin/tasks/task1-basic-info",
-      2: "/admin/tasks/task2-documents",
-      3: "/admin/tasks/task3-certificates",
-      4: "/admin/tasks/task4-email-verification",
-      5: "/admin/tasks/task5-infrastructure",
-      6: "/admin/tasks/task6-historical",
-      7: "/admin/tasks/task7-grampanchayat",
-      8: "/admin/tasks/task8-announcements",
-      9: "/admin/tasks/task9-hero-images",
-      10: "/admin/tasks/task10-tax-payment",
-      11: "/admin/tasks/task11-projects",
-    };
-
-    if (routes[taskNumber]) {
-      router.push(routes[taskNumber]);
+  const goToTask = (taskId: string) => {
+    const task = ADMIN_TASKS.find(t => t.id === taskId);
+    if (task) {
+      router.push(task.route);
     } else {
-      console.error(`Invalid task number: ${taskNumber}`);
+      console.error(`Invalid task ID: ${taskId}`);
     }
   };
 
   // Filter tasks based on user permissions
-  const allowedTasks = Object.entries(taskCompletion).filter(([task]) =>
-    hasPermission(task)
+  const allowedTasks = ADMIN_TASKS.filter((task) =>
+    hasPermission(task.id)
   );
 
   if (permissionsLoading) {
@@ -296,30 +217,28 @@ function DashboardContent() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {allowedTasks.map(([task, progress], index) => {
-            // Get the actual task number from the task key
-            const taskNumber = parseInt(task.replace("task", ""));
+          {allowedTasks.map((task) => {
+            const progress = taskCompletion[task.id] || 0;
 
             return (
               <Card
-                key={task}
+                key={task.id}
                 className="shadow-md hover:shadow-lg transition-shadow"
               >
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between text-base sm:text-lg">
                     <span className="line-clamp-1">
-                      {TASK_INFO[task]?.name || task}
+                      {task.name}
                     </span>
-
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
-                    {TASK_INFO[task]?.description}
+                    {task.description}
                   </p>
                   <Button
                     variant={progress === 100 ? "default" : "outline"}
-                    onClick={() => goToTask(taskNumber)}
+                    onClick={() => goToTask(task.id)}
                     className={`mt-2 w-full ${
                       progress === 100 ? "bg-green-600 hover:bg-green-700" : ""
                     }`}

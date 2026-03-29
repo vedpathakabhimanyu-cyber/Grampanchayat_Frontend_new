@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import websiteAPI from "@/lib/api";
+import { toast } from "sonner";
 import {
   FaMapMarkerAlt,
   FaPhone,
@@ -57,7 +58,7 @@ export default function ContactPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
-    alert("तुमचा संदेश पाठवला गेला आहे. आम्ही लवकरच तुमच्याशी संपर्क साधू.");
+    toast.success("तुमचा संदेश पाठवला गेला आहे. आम्ही लवकरच तुमच्याशी संपर्क साधू.");
     setFormData({
       name: "",
       email: "",

@@ -130,7 +130,7 @@ export default function GalleryPage() {
                   className="max-w-5xl w-full my-auto mx-2 sm:mx-4"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="relative w-full max-h-[60vh] sm:max-h-[70vh] overflow-hidden rounded-t-lg">
+                  <div className="relative w-full max-h-[50vh] sm:max-h-[65vh] md:max-h-[70vh] overflow-hidden rounded-t-lg">
                     <Image
                       src={image.imageUrl || image.imagePath}
                       alt={image.title || image.description || "फोटो"}
@@ -139,19 +139,25 @@ export default function GalleryPage() {
                       className="w-full h-full object-contain shadow-2xl"
                     />
                   </div>
-                  <div className="bg-white p-3 sm:p-4 md:p-6 rounded-b-lg">
-                    <h2 className="text-base sm:text-xl md:text-2xl font-bold text-government-blue mb-1 sm:mb-2 break-words">
-                      {replaceWithMarathiDigits(image.title || "फोटो")}
-                    </h2>
+                  <div className="bg-white p-4 sm:p-6 md:p-8 rounded-b-lg space-y-3 md:space-y-4">
+                    <div>
+                      <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-government-blue mb-2 md:mb-3 break-words leading-tight">
+                        {replaceWithMarathiDigits(image.title || "फोटो")}
+                      </h2>
+                    </div>
                     {image.description && (
-                      <p className="text-sm sm:text-sm text-gray-600 mb-1 sm:mb-2 break-words">
-                        {replaceWithMarathiDigits(image.description)}
-                      </p>
+                      <div>
+                        <p className="text-sm sm:text-base md:text-lg text-gray-700 break-words leading-relaxed">
+                          {replaceWithMarathiDigits(image.description)}
+                        </p>
+                      </div>
                     )}
                     {image.createdAt && (
-                      <p className="text-sm sm:text-sm text-gray-500">
-                        {new Date(image.createdAt).toLocaleDateString("mr-IN")}
-                      </p>
+                      <div className="pt-2 sm:pt-3 border-t border-gray-200">
+                        <p className="text-xs sm:text-sm text-gray-500 font-medium">
+                          📅 {new Date(image.createdAt).toLocaleDateString("mr-IN")}
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>

@@ -25,7 +25,12 @@ const Navigation = () => {
     { name: "प्रकल्प / काम", href: "/projects", hasDropdown: false },
     { name: "कर भरणी", href: "/tax-payment", hasDropdown: false },
     { name: "संपर्क", href: "/contact", hasDropdown: false },
-    { name: "प्रशासन लॉगिन", href: "/admin/login", hasDropdown: false, isAdmin: true },
+    {
+      name: "प्रशासन लॉगिन",
+      href: "/admin/login",
+      hasDropdown: false,
+      isAdmin: true,
+    },
   ];
 
   const toggleDropdown = (name: string) => {
@@ -35,8 +40,8 @@ const Navigation = () => {
   return (
     <nav className="bg-[#0A1931] text-white sticky top-0 z-50 shadow-md">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-12">
-          <div className="hidden md:flex space-x-1 w-full justify-center text-base lg:text-lg font-medium">
+        <div className="flex justify-between items-center h-16 py-2">
+          <div className="hidden md:flex space-x-2 w-full justify-center text-base lg:text-lg font-medium">
             {menuItems.map((item) => (
               <div
                 key={item.name}
@@ -48,9 +53,9 @@ const Navigation = () => {
               >
                 <Link
                   href={item.href}
-                  className={`px-3 py-1.5 transition-colors duration-200 flex items-center space-x-1 rounded ${
-                    item.isAdmin 
-                      ? "bg-[#1A3D63] border border-[#4A7FA7] hover:bg-[#2A5068] font-bold text-white ml-2" 
+                  className={`px-4 py-2.5 transition-colors duration-200 flex items-center space-x-1 rounded ${
+                    item.isAdmin
+                      ? "bg-[#1A3D63] border border-[#4A7FA7] hover:bg-[#2A5068] font-bold text-white ml-2"
                       : "hover:bg-[#11264d]"
                   }`}
                 >

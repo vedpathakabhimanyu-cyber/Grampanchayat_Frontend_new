@@ -63,7 +63,7 @@ const Footer = () => {
               आहोत.
             </p>
           </div>
- 
+
           {/* Quick Links */}
           <div>
             <h3 className="text-h3 font-bold mb-4 text-navy-light">
@@ -112,7 +112,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
- 
+
           {/* Important Links */}
           <div>
             <h3 className="text-h3 font-bold mb-4 text-navy-light">
@@ -171,7 +171,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
- 
+
           {/* Contact Info */}
           <div>
             <h3 className="text-h3 font-bold mb-4 text-navy-light">
@@ -200,7 +200,9 @@ const Footer = () => {
               {gpInfo?.phone && (
                 <li className="flex items-center gap-2">
                   <FaPhone className="text-navy-light rotate-90" />
-                  <span className="text-gray-400">{replaceWithMarathiDigits(gpInfo.phone)}</span>
+                  <span className="text-gray-400">
+                    {replaceWithMarathiDigits(gpInfo.phone)}
+                  </span>
                 </li>
               )}
               <li className="flex items-center gap-2">
@@ -211,14 +213,15 @@ const Footer = () => {
           </div>
         </div>
       </div>
- 
+
       {/* Bottom Footer */}
       <div className="border-t border-gray-800 text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-base text-gray-400 text-center md:text-left">
               <p>
-                © {replaceWithMarathiDigits("2025")} {gpInfo?.grampanchayatName || "..."}. सर्व हक्क राखीव.
+                © {replaceWithMarathiDigits("2026")}{" "}
+                {gpInfo?.grampanchayatName || "..."}. सर्व हक्क राखीव.
               </p>
               <p className="mt-1">
                 वेबसाइट निर्माण:{" "}

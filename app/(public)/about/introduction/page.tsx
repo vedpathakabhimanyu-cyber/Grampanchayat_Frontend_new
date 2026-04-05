@@ -96,16 +96,16 @@ const iconMap: Record<string, React.ReactElement> = {
 export default function IntroductionPage() {
   const [stats, setStats] = useState<DocumentData[]>([]);
   const [infrastructure, setInfrastructure] = useState<InfrastructureItem[]>(
-    []
+    [],
   );
   const [timeline, setTimeline] = useState<HistoricalEvent[]>([]);
   const [historicalPlaces, setHistoricalPlaces] = useState<HistoricalPlace[]>(
-    []
+    [],
   );
   const [gpInfo, setGpInfo] = useState<GrampanchayatInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [historicalAwards, setHistoricalAwards] = useState<HistoricalAward[]>(
-    []
+    [],
   );
 
   useEffect(() => {
@@ -117,34 +117,39 @@ export default function IntroductionPage() {
       try {
         const infraRes = await websiteAPI.getInfrastructure();
         console.log("Infrastructure API Response:", infraRes);
-        
+
         if (infraRes && infraRes.success && Array.isArray(infraRes.data)) {
           const allInfraData = infraRes.data;
 
           // Statistics for dashboard (subcategory: "आकडेवारी")
           const statsData = allInfraData.filter(
-            (item: InfrastructureItem) => item.subcategory === "आकडेवारी"
+            (item: InfrastructureItem) => item.subcategory === "आकडेवारी",
           );
           console.log("Filtered stats data:", statsData);
 
-          const transformedStats = statsData.map((item: InfrastructureItem) => ({
-            id: item.id,
-            title: item.facility,
-            data: {
-              value: item.count,
-              icon: getIconForFacility(item.facility),
-            },
-          }));
+          const transformedStats = statsData.map(
+            (item: InfrastructureItem) => ({
+              id: item.id,
+              title: item.facility,
+              data: {
+                value: item.count,
+                icon: getIconForFacility(item.facility),
+              },
+            }),
+          );
 
           setStats(transformedStats as any);
 
           // Other infrastructure
           const otherInfra = allInfraData.filter(
-            (item: InfrastructureItem) => item.subcategory !== "आकडेवारी"
+            (item: InfrastructureItem) => item.subcategory !== "आकडेवारी",
           );
           setInfrastructure(otherInfra);
         } else {
-          console.warn("Infrastructure API returned unsuccessful or empty data:", infraRes);
+          console.warn(
+            "Infrastructure API returned unsuccessful or empty data:",
+            infraRes,
+          );
         }
       } catch (error) {
         console.error("Failed to fetch infrastructure:", error);
@@ -203,13 +208,16 @@ export default function IntroductionPage() {
   };
 
   // Group infrastructure by subcategory
-  const groupedInfrastructure = infrastructure.reduce((acc, item) => {
-    if (!acc[item.subcategory]) {
-      acc[item.subcategory] = [];
-    }
-    acc[item.subcategory].push(item);
-    return acc;
-  }, {} as Record<string, InfrastructureItem[]>);
+  const groupedInfrastructure = infrastructure.reduce(
+    (acc, item) => {
+      if (!acc[item.subcategory]) {
+        acc[item.subcategory] = [];
+      }
+      acc[item.subcategory].push(item);
+      return acc;
+    },
+    {} as Record<string, InfrastructureItem[]>,
+  );
 
   return (
     <>
@@ -293,13 +301,14 @@ export default function IntroductionPage() {
                           <ul className="space-y-1 text-gray-700 text-sm sm:text-sm md:text-base font-marathi">
                             {items.map((item) => (
                               <li key={item.id}>
-                                • {item.facility}: {replaceWithMarathiDigits(item.count)}
+                                • {item.facility}:{" "}
+                                {replaceWithMarathiDigits(item.count)}
                               </li>
                             ))}
                           </ul>
                         </div>
                       );
-                    }
+                    },
                   )}
                 </div>
               )}
@@ -312,8 +321,10 @@ export default function IntroductionPage() {
               <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-6">
                 <div className="bg-[#0A1931] rounded-lg shadow-md text-white px-5 py-1 flex items-center justify-start space-x-3 mb-2 mt-2">
                   <TrendingUp className="text-lg sm:text-xl md:text-2xl mr-2" />
-              <h3 className="bg-[#0A1931] rounded-t-lg shadow-md text-white px-5 py-2.5 flex items-center justify-start space-x-3" style={{ marginBottom: "1px"
-}}>
+                  <h3
+                    className="bg-[#0A1931] rounded-t-lg shadow-md text-white px-5 py-2.5 flex items-center justify-start space-x-3"
+                    style={{ marginBottom: "1px" }}
+                  >
                     मुख्य आकडेवारी (माझे गाव, माझी प्रगती)
                   </h3>
                 </div>
@@ -337,7 +348,9 @@ export default function IntroductionPage() {
                           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-0">
                             <div className="mb-1 sm:mb-0">
                               <h4 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
-                                {item.data?.value ? formatMarathiNumber(item.data.value) : replaceWithMarathiDigits("०")}
+                                {item.data?.value
+                                  ? formatMarathiNumber(item.data.value)
+                                  : replaceWithMarathiDigits("०")}
                               </h4>
                               <p className="text-sm sm:text-sm md:text-base text-gray-600">
                                 {item.title}
@@ -359,171 +372,182 @@ export default function IntroductionPage() {
           </section>
           <div className="border-t pt-10 mt-10">
             {/* History Header */}
-          {/* Page Header */}
-          <div className="bg-[#0A1931] rounded-lg shadow-md text-white px-5 py-1 flex items-center justify-start space-x-3 mb-2 mt-2">
+            {/* Page Header */}
+            <div className="bg-[#0A1931] rounded-lg shadow-md text-white px-5 py-1 flex items-center justify-start space-x-3 mb-2 mt-2">
               <h3 className="text-h6 font-bold tracking-wide font-marathi">
-              इतिहास
-            </h3>
-          </div>
+                इतिहास
+              </h3>
+            </div>
 
-          {/* Introduction */}
-          <section className="bg-white rounded-lg shadow-lg p-6 sm:p-8 mb-8 max-w-7xl mx-auto">
-            {/* Section Content */}
-            <p className="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
-              आमच्या गावाला समृद्ध ऐतिहासिक वारसा आहे. स्वातंत्र्य चळवळीत आमच्या
-              गावाने महत्त्वाची भूमिका बजावली आणि आजही त्या वीर सैनिकांचे स्मरण
-              केले जाते.
-            </p>
-          </section>
+            {/* Introduction */}
+            <section className="bg-white rounded-lg shadow-lg p-6 sm:p-8 mb-8 max-w-7xl mx-auto">
+              {/* Section Content */}
+              <p className="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                आमच्या गावाला समृद्ध ऐतिहासिक वारसा आहे. स्वातंत्र्य चळवळीत
+                आमच्या गावाने महत्त्वाची भूमिका बजावली आणि आजही त्या वीर
+                सैनिकांचे स्मरण केले जाते.
+              </p>
+            </section>
 
-          {/* Timeline */}
-          <section className="mb-10">
+            {/* Timeline */}
+            <section className="mb-10">
               <h3 className="text-h6 font-bold tracking-wide font-marathi">
-              ऐतिहासिक कालखंड
-            </h3>
+                ऐतिहासिक कालखंड
+              </h3>
 
-            {loading ? (
-              <div className="text-center py-10">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A1931]"></div>
-                <p className="mt-2 text-gray-600">लोड होत आहे...</p>
-              </div>
-            ) : timeline.length === 0 ? (
-              <div className="text-center py-10 bg-white rounded-lg">
-                <p className="text-gray-600">ऐतिहासिक माहिती उपलब्ध नाही</p>
-              </div>
-            ) : (
-              <div className="relative border-l-4 border-government-blue ml-6 pl-8 space-y-8 max-w-7xl mx-auto">
-                {timeline.map((event, index) => {
-                  const colors = [
-                    "bg-orange-500",
-                    "bg-blue-500",
-                    "bg-green-500",
-                    "bg-red-500",
-                  ];
-                  const color = colors[index % colors.length];
+              {loading ? (
+                <div className="text-center py-10">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A1931]"></div>
+                  <p className="mt-2 text-gray-600">लोड होत आहे...</p>
+                </div>
+              ) : timeline.length === 0 ? (
+                <div className="text-center py-10 bg-white rounded-lg">
+                  <p className="text-gray-600">ऐतिहासिक माहिती उपलब्ध नाही</p>
+                </div>
+              ) : (
+                <div className="relative border-l-4 border-government-blue ml-6 pl-8 space-y-8 max-w-7xl mx-auto">
+                  {timeline.map((event, index) => {
+                    const colors = [
+                      "bg-orange-500",
+                      "bg-blue-500",
+                      "bg-green-500",
+                      "bg-red-500",
+                    ];
+                    const color = colors[index % colors.length];
 
-                  return (
-                    <div key={event.id} className="relative">
+                    return (
+                      <div key={event.id} className="relative">
+                        {/* Timeline Dot */}
+                        <div
+                          className={`absolute -left-[22px] top-3 w-4 h-4 rounded-full border-4 border-white shadow-md ${color}`}
+                        ></div>
+
+                        {/* Timeline Card */}
+                        <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 max-w-3xl w-full">
+                          <div className="flex items-center mb-3">
+                            <FaCalendarAlt
+                              className={`text-lg sm:text-xl mr-2 ${color.replace(
+                                "bg-",
+                                "text-",
+                              )}`}
+                            />
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-government-blue">
+                              {replaceWithMarathiDigits(event.year)}
+                            </h3>
+                          </div>
+
+                          <h4 className="text-base sm:text-lg md:text-xl font-medium text-government-blue mb-2">
+                            {event.eventName}
+                          </h4>
+                          {event.additionalInfo && (
+                            <p className="text-gray-700 text-sm sm:text-sm md:text-base leading-relaxed">
+                              {event.additionalInfo}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+
+            {/* Historical Places */}
+            <section className="mb-10">
+              <h3 className="text-h6 font-bold tracking-wide font-marathi">
+                ऐतिहासिक स्थळे
+              </h3>
+
+              {loading ? (
+                <div className="text-center py-10">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A1931]"></div>
+                  <p className="mt-2 text-gray-600">लोड होत आहे...</p>
+                </div>
+              ) : historicalPlaces.length === 0 ? (
+                <div className="text-center py-10 bg-white rounded-lg">
+                  <p className="text-gray-600">
+                    ऐतिहासिक स्थळे माहिती उपलब्ध नाही
+                  </p>
+                </div>
+              ) : (
+                <div className="relative border-l-4 border-government-blue ml-6 pl-8 space-y-8 max-w-3xl mx-auto">
+                  {historicalPlaces.map((place, index) => (
+                    <div key={place.id} className="relative">
                       {/* Timeline Dot */}
-                      <div
-                        className={`absolute -left-[22px] top-3 w-4 h-4 rounded-full border-4 border-white shadow-md ${color}`}
-                      ></div>
+                      <div className="absolute -left-[22px] top-3 w-4 h-4 rounded-full border-4 border-white shadow-md bg-[#0A1931]"></div>
 
                       {/* Timeline Card */}
-                      <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 max-w-3xl w-full">
+                      <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                         <div className="flex items-center mb-3">
-                          <FaCalendarAlt
-                            className={`text-lg sm:text-xl mr-2 ${color.replace(
-                              "bg-",
-                              "text-"
-                            )}`}
-                          />
+                          <FaMapMarkerAlt className="text-lg sm:text-xl mr-2 text-[#0A1931]" />
                           <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-government-blue">
-                            {replaceWithMarathiDigits(event.year)}
+                            {place.placeName}
                           </h3>
                         </div>
-
-                        <h4 className="text-base sm:text-lg md:text-xl font-medium text-government-blue mb-2">
-                          {event.eventName}
-                        </h4>
-                        {event.additionalInfo && (
+                        {place.placeInfo && (
                           <p className="text-gray-700 text-sm sm:text-sm md:text-base leading-relaxed">
-                            {event.additionalInfo}
+                            {place.placeInfo}
                           </p>
                         )}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
+                  ))}
+                </div>
+              )}
+            </section>
 
-          {/* Historical Places */}
-          <section className="mb-10">
-              <h3 className="text-h6 font-bold tracking-wide font-marathi">
-              ऐतिहासिक स्थळे
-            </h3>
-
-            {loading ? (
-              <div className="text-center py-10">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A1931]"></div>
-                <p className="mt-2 text-gray-600">लोड होत आहे...</p>
+            {/* Awards Section */}
+            <section className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+              {/* Header */}
+              <div className="bg-[#0A1931] rounded-lg shadow-md text-white px-5 py-1 flex items-center justify-start space-x-3 mb-2 mt-2">
+                <h3 className="text-h6 font-bold tracking-wide font-marathi">
+                  गावाचे पुरस्कार
+                </h3>
               </div>
-            ) : historicalPlaces.length === 0 ? (
-              <div className="text-center py-10 bg-white rounded-lg">
-                <p className="text-gray-600">
-                  ऐतिहासिक स्थळे माहिती उपलब्ध नाही
-                </p>
-              </div>
-            ) : (
-              <div className="relative border-l-4 border-government-blue ml-6 pl-8 space-y-8 max-w-3xl mx-auto">
-                {historicalPlaces.map((place, index) => (
-                  <div key={place.id} className="relative">
-                    {/* Timeline Dot */}
-                    <div className="absolute -left-[22px] top-3 w-4 h-4 rounded-full border-4 border-white shadow-md bg-[#0A1931]"></div>
 
-                    {/* Timeline Card */}
-                    <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                      <div className="flex items-center mb-3">
-                        <FaMapMarkerAlt className="text-lg sm:text-xl mr-2 text-[#0A1931]" />
-                        <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-government-blue">
-                          {place.placeName}
-                        </h3>
+              {/* Content */}
+              <div className="p-6 sm:p-8">
+                {loading ? (
+                  <div className="text-center py-10">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A1931]"></div>
+                    <p className="mt-2 text-gray-600">
+                      पुरस्कार लोड होत आहेत...
+                    </p>
+                  </div>
+                ) : historicalAwards.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-gray-600">पुरस्कार उपलब्ध नाहीत.</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 w-full">
+                    {historicalAwards.map((award) => (
+                      <div
+                        key={award.id}
+                        className="bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-md p-5 border border-blue-100 hover:shadow-lg transition-shadow hover:border-blue-300"
+                      >
+                        <div className="flex items-start gap-3 mb-3">
+                          {award.year && (
+                            <span className="text-2xl font-bold text-blue-600 min-w-fit">
+                              {replaceWithMarathiDigits(award.year)}
+                            </span>
+                          )}
+                          <div className="flex-1">
+                            <h4 className="text-gray-800 font-semibold text-sm sm:text-base">
+                              {award.awardName}
+                            </h4>
+                          </div>
+                        </div>
+                        {award.awardDescription && (
+                          <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
+                            {award.awardDescription}
+                          </p>
+                        )}
                       </div>
-                      {place.placeInfo && (
-                        <p className="text-gray-700 text-sm sm:text-sm md:text-base leading-relaxed">
-                          {place.placeInfo}
-                        </p>
-                      )}
-                    </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </section>
-
-          {/* Awards Section */}
-          <section className="mb-10">
-              <h3 className="text-h6 font-bold tracking-wide font-marathi">
-              गावाचे पुरस्कार
-            </h3>
-            {loading ? (
-              <div className="text-center py-10">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A1931]"></div>
-                <p className="mt-2 text-gray-600">पुरस्कार लोड होत आहेत...</p>
-              </div>
-            ) : historicalAwards.length === 0 ? (
-              <div className="text-center py-10 bg-white rounded-lg">
-                <p className="text-gray-600">पुरस्कार उपलब्ध नाहीत.</p>
-              </div>
-            ) : (
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 max-w-4xl mx-auto">
-                {historicalAwards.map((award) => (
-                  <div
-                    key={award.id}
-                    className="bg-white rounded-lg shadow p-4 border"
-                  >
-                    <div className="flex items-center mb-2">
-                      {award.year && (
-                        <span className="text-blue-600 font-bold mr-2">
-                          {replaceWithMarathiDigits(award.year)}
-                        </span>
-                      )}
-                      <span className="text-gray-800 font-semibold">
-                        {award.awardName}
-                      </span>
-                    </div>
-                    {award.awardDescription && (
-                      <p className="text-gray-600 text-sm">
-                        {award.awardDescription}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+            </section>
           </div>
         </div>
       </main>

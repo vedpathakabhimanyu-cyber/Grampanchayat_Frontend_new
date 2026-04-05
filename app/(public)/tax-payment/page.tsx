@@ -3,7 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { websiteAPI } from "@/lib/api";
 import Image from "next/image";
-import { Landmark, FileText, QrCode, Download, CreditCard, ShieldCheck } from "lucide-react";
+import {
+  Landmark,
+  FileText,
+  QrCode,
+  Download,
+  CreditCard,
+  ShieldCheck,
+} from "lucide-react";
 import { replaceWithMarathiDigits } from "@/lib/utils";
 
 interface TaxPaymentData {
@@ -13,18 +20,34 @@ interface TaxPaymentData {
   accountName: string;
   accountNo: string;
   ifscCode: string;
+  upiId?: string;
+}
+
+interface GrampanchayatInfo {
+  grampanchayatName?: string;
+  talukaName?: string;
+  districtName?: string;
 }
 
 export default function TaxPaymentPublicPage() {
   const [data, setData] = useState<TaxPaymentData | null>(null);
+  const [gpInfo, setGpInfo] = useState<GrampanchayatInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await websiteAPI.getTaxPayment();
-        if (response.success && response.data) {
-          setData(response.data);
+        const [taxResponse, gpResponse] = await Promise.all([
+          websiteAPI.getTaxPayment(),
+          websiteAPI.getGrampanchayatInfo(),
+        ]);
+
+        if (taxResponse.success && taxResponse.data) {
+          setData(taxResponse.data);
+        }
+
+        if (gpResponse.success && gpResponse.data) {
+          setGpInfo(gpResponse.data);
         }
       } catch (error) {
         console.error("Failed to fetch tax payment info:", error);
@@ -53,14 +76,14 @@ export default function TaxPaymentPublicPage() {
         </div>
         <div className="bg-white rounded-lg shadow-md p-4 mb-8">
           <p className="text-blue-900/70 text-sm md:text-base">
-            तुमचा ग्रामपंचायत कर ऑनलाइन भरण्यासाठी खालील माहितीचा वापर करा. डिजिटल इंडिया मोहिमेला साथ द्या.
+            तुमचा ग्रामपंचायत कर ऑनलाइन भरण्यासाठी खालील माहितीचा वापर करा.
+            डिजिटल इंडिया मोहिमेला साथ द्या.
           </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
           {/* Left: QR Code Section */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 sticky top-24">
@@ -76,10 +99,12 @@ export default function TaxPaymentPublicPage() {
                     {data.qrFileUrl.toLowerCase().endsWith(".pdf") ? (
                       <div className="flex flex-col items-center justify-center h-full">
                         <FileText className="h-24 w-24 text-red-500 mb-4" />
-                        <p className="text-sm font-semibold text-gray-700 text-center">PDF माहिती दस्तऐवज</p>
-                        <a 
-                          href={data.qrFileUrl} 
-                          target="_blank" 
+                        <p className="text-sm font-semibold text-gray-700 text-center">
+                          PDF माहिती दस्तऐवज
+                        </p>
+                        <a
+                          href={data.qrFileUrl}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="mt-6 bg-[#0A1931] text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-black transition-colors"
                         >
@@ -95,9 +120,9 @@ export default function TaxPaymentPublicPage() {
                           className="object-contain p-2"
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl backdrop-blur-[2px]">
-                           <a 
-                            href={data.qrFileUrl} 
-                            download 
+                          <a
+                            href={data.qrFileUrl}
+                            download
                             className="bg-white text-[#0A1931] px-6 py-2 rounded-lg font-bold flex items-center gap-2"
                           >
                             <Download size={18} /> डाऊनलोड करा
@@ -112,12 +137,13 @@ export default function TaxPaymentPublicPage() {
                     <p className="text-sm">QR कोड उपलब्ध नाही</p>
                   </div>
                 )}
-                
+
                 <div className="mt-8 w-full">
                   <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
                     <ShieldCheck className="text-blue-600 flex-shrink-0" />
                     <p className="text-sm text-blue-800 font-medium">
-                      कृपया स्कॅन करताना 'Grampanchayat Karvat' हे नाव असल्याची खात्री करा.
+                      कृपया स्कॅन करताना {data?.upiId && `(${data.upiId})`} हे
+                      नाव असल्याची खात्री करा.
                     </p>
                   </div>
                 </div>
@@ -135,7 +161,7 @@ export default function TaxPaymentPublicPage() {
                   कर देयकासंबंधी महत्त्वाची माहिती
                 </h2>
               </div>
-               <div className="p-8">
+              <div className="p-8">
                 {data?.taxInfo ? (
                   <div className="prose max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed text-base md:text-lg italic font-medium border-l-4 border-[#0A1931] pl-6 bg-gray-50 py-4 rounded-r-lg">
                     {data.taxInfo}
@@ -162,18 +188,26 @@ export default function TaxPaymentPublicPage() {
                         <Landmark size={24} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">बँकेचे नाव</p>
-                        <p className="text-lg font-bold text-gray-800">{data?.bankName || "माहिती उपलब्ध नाही"}</p>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+                          बँकेचे नाव
+                        </p>
+                        <p className="text-lg font-bold text-gray-800">
+                          {data?.bankName || "माहिती उपलब्ध नाही"}
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200">
                       <div className="bg-blue-50 p-3 rounded-lg text-[#0A1931]">
                         <CreditCard size={24} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">खाते नाव</p>
-                        <p className="text-lg font-bold text-gray-800">{data?.accountName || "माहिती उपलब्ध नाही"}</p>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+                          खाते नाव
+                        </p>
+                        <p className="text-lg font-bold text-gray-800">
+                          {data?.accountName || "माहिती उपलब्ध नाही"}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -184,7 +218,9 @@ export default function TaxPaymentPublicPage() {
                         <FileText size={24} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">खाते क्रमांक</p>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+                          खाते क्रमांक
+                        </p>
                         <p className="text-xl font-black text-gray-900 tracking-wider font-mono bg-gray-100 px-3 py-1 rounded-md border border-gray-200">
                           {replaceWithMarathiDigits(data?.accountNo) || "..."}
                         </p>
@@ -196,7 +232,9 @@ export default function TaxPaymentPublicPage() {
                         <ShieldCheck size={24} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">IFSC कोड</p>
+                        <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+                          IFSC कोड
+                        </p>
                         <p className="text-xl font-black text-gray-900 tracking-wider font-mono bg-gray-100 px-3 py-1 rounded-md border border-gray-200">
                           {data?.ifscCode || "..."}
                         </p>

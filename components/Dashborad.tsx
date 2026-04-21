@@ -32,7 +32,7 @@ export default function Dashboard() {
         if (response.success && response.data) {
           // Filter only 'आकडेवारी'
           const statsData = response.data.filter(
-            (item: InfrastructureItem) => item.subcategory === "आकडेवारी"
+            (item: InfrastructureItem) => item.subcategory === "आकडेवारी",
           );
 
           const transformedStats = statsData.map(
@@ -42,7 +42,7 @@ export default function Dashboard() {
               data: {
                 value: item.count,
               },
-            })
+            }),
           );
 
           setStats(transformedStats);
@@ -59,18 +59,18 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <section className="mb-10 mt-4">
+    <section className="mb-8 md:mb-12 mt-4 w-full">
       <div>
         {/* Latest Stats Section - Full Width */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-[#0A1931] rounded-t-lg shadow-md text-white px-5 py-2.5 flex items-center space-x-3">
-          <TrendingUp className="text-lg sm:text-xl md:text-2xl" />
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-wide">
-            मुख्य आकडेवारी (माझे गाव, माझी प्रगती)
-          </h2>
-        </div>
+          <div className="bg-[#0A1931] rounded-t-lg shadow-md text-white px-4 sm:px-5 md:px-6 py-2.5 flex items-center space-x-2 sm:space-x-3">
+            <TrendingUp className="text-lg sm:text-xl md:text-2xl flex-shrink-0" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold tracking-wide truncate">
+              मुख्य आकडेवारी (माझे गाव, माझी प्रगती)
+            </h2>
+          </div>
 
-          <div className="p-4 sm:p-6">
+          <div className="p-4 sm:p-5 md:p-6 lg:p-8">
             {loading ? (
               <div className="text-center py-10">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A1931]"></div>
@@ -81,16 +81,18 @@ export default function Dashboard() {
                 <p className="text-gray-600">आकडेवारी उपलब्ध नाही</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
                 {stats.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-gray-50 rounded-lg p-4 sm:p-6 border border-gray-100 hover:shadow-md transition-shadow"
+                    className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3 sm:p-4 md:p-6 border border-gray-200 hover:shadow-lg hover:-translate-y-0.5 transition-all"
                   >
-                    <h4 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center">
-                      {item.data?.value ? formatMarathiNumber(item.data.value) : replaceWithMarathiDigits("०")}
+                    <h4 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 text-center">
+                      {item.data?.value
+                        ? formatMarathiNumber(item.data.value)
+                        : replaceWithMarathiDigits("०")}
                     </h4>
-                    <p className="text-base sm:text-lg text-center text-gray-600 mt-1">
+                    <p className="text-xs sm:text-sm md:text-base text-center text-gray-600 mt-1 sm:mt-2 font-medium">
                       {item.title}
                     </p>
                   </div>
@@ -98,10 +100,10 @@ export default function Dashboard() {
               </div>
             )}
 
-            <div className="mt-4 text-center">
+            <div className="mt-6 sm:mt-8 text-center">
               <Link
                 href="/about/introduction"
-                className="inline-block bg-[#0A1931] hover:bg-[#142b4a] text-white font-medium text-base md:text-lg px-5 py-2 rounded-lg transition-colors duration-200"
+                className="inline-block bg-[#0A1931] hover:bg-[#142b4a] text-white font-medium text-sm sm:text-base md:text-lg px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors duration-200"
               >
                 अधिक माहिती
               </Link>

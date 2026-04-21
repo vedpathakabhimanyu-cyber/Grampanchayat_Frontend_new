@@ -2,7 +2,12 @@
 
 import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import Cropper from "react-easy-crop";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/admin/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/admin/ui/card";
 import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { Textarea } from "@/components/admin/ui/textarea";
@@ -11,7 +16,7 @@ import { GetCroppedImg } from "./GetCroppedImg";
 import { useRouter } from "next/navigation";
 import { imagesAPI } from "@/lib/admin/api";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { RotateCcw, RotateCw, Trash2 } from "lucide-react";
 
 interface Photo {
   id: string;
@@ -42,6 +47,7 @@ export default function PhotoGalleryPage() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [isCropping, setIsCropping] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -74,7 +80,9 @@ export default function PhotoGalleryPage() {
 
     try {
       await imagesAPI.delete(deletingId);
-      setExistingPhotos(existingPhotos.filter((photo) => photo.id !== deletingId));
+      setExistingPhotos(
+        existingPhotos.filter((photo) => photo.id !== deletingId),
+      );
       toast.success("फोटो यशस्वीरित्या हटवला!");
     } catch (error) {
       console.error("Error deleting photo:", error);
@@ -95,6 +103,7 @@ export default function PhotoGalleryPage() {
     setImageSrc(null);
     setCrop({ x: 0, y: 0 });
     setZoom(1);
+    setRotation(0);
     setCroppedAreaPixels(null);
     setIsCropping(false);
     setShowOptions(false);
@@ -106,6 +115,9 @@ export default function PhotoGalleryPage() {
     const reader = new FileReader();
     reader.onloadend = () => {
       setImageSrc(reader.result as string);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setRotation(0);
       setCurrentPhoto((prev) => ({ ...prev, file }));
       setIsCropping(true);
     };
@@ -116,13 +128,17 @@ export default function PhotoGalleryPage() {
     (_croppedArea: any, croppedPixels: any) => {
       setCroppedAreaPixels(croppedPixels);
     },
-    []
+    [],
   );
 
   const handleCropConfirm = async () => {
     if (!currentPhoto.file || !croppedAreaPixels) return;
     try {
-      const blob = await GetCroppedImg(currentPhoto.file, croppedAreaPixels);
+      const blob = await GetCroppedImg(
+        currentPhoto.file,
+        croppedAreaPixels,
+        rotation,
+      );
       const croppedFile = new File([blob], currentPhoto.file.name, {
         type: currentPhoto.file.type,
       });
@@ -160,7 +176,7 @@ export default function PhotoGalleryPage() {
             photo.croppedFile,
             photo.title,
             photo.description,
-            "gallery"
+            "gallery",
           );
         }
       }
@@ -171,7 +187,9 @@ export default function PhotoGalleryPage() {
       router.push("/admin/dashboard");
     } catch (error: any) {
       console.error("Error uploading photos:", error);
-      toast.error("त्रुटी: " + (error.message || "फोटो अपलोड करताना समस्या आली"));
+      toast.error(
+        "त्रुटी: " + (error.message || "फोटो अपलोड करताना समस्या आली"),
+      );
     }
   };
 
@@ -197,7 +215,9 @@ export default function PhotoGalleryPage() {
                 >
                   <div className="relative h-48 w-full">
                     <Image
-                      src={photo.imageUrl || photo.preview || "/placeholder.jpg"}
+                      src={
+                        photo.imageUrl || photo.preview || "/placeholder.jpg"
+                      }
                       alt={photo.title || "Photo"}
                       fill
                       className="object-cover"
@@ -243,7 +263,10 @@ export default function PhotoGalleryPage() {
                 placeholder="शीर्षक"
                 value={currentPhoto.title}
                 onChange={(e) =>
-                  setCurrentPhoto((prev) => ({ ...prev, title: e.target.value }))
+                  setCurrentPhoto((prev) => ({
+                    ...prev,
+                    title: e.target.value,
+                  }))
                 }
               />
 
@@ -251,7 +274,10 @@ export default function PhotoGalleryPage() {
                 placeholder="वर्णन"
                 value={currentPhoto.description}
                 onChange={(e) =>
-                  setCurrentPhoto((prev) => ({ ...prev, description: e.target.value }))
+                  setCurrentPhoto((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
                 }
               />
 
@@ -323,9 +349,11 @@ export default function PhotoGalleryPage() {
                   image={imageSrc}
                   crop={crop}
                   zoom={zoom}
+                  rotation={rotation}
                   aspect={4 / 3}
                   onCropChange={setCrop}
                   onZoomChange={setZoom}
+                  onRotationChange={setRotation}
                   onCropComplete={onCropComplete}
                 />
               </div>
@@ -344,11 +372,45 @@ export default function PhotoGalleryPage() {
                     className="flex-1"
                   />
                 </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs sm:text-sm font-medium text-gray-700 min-w-[60px]">
+                    फिरवा:
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setRotation((prev) => prev - 90)}
+                    className="h-9 w-9 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+                    title="डावीकडे फिरवा"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+                  <input
+                    type="range"
+                    min={0}
+                    max={360}
+                    step={1}
+                    value={((rotation % 360) + 360) % 360}
+                    onChange={(e) => setRotation(Number(e.target.value))}
+                    className="flex-1"
+                  />
+                  <span className="min-w-[56px] text-xs sm:text-sm text-gray-700 text-right">
+                    {Math.round(rotation)}°
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setRotation((prev) => prev + 90)}
+                    className="h-9 w-9 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 flex items-center justify-center"
+                    title="उजवीकडे फिरवा"
+                  >
+                    <RotateCw className="h-4 w-4" />
+                  </button>
+                </div>
                 <div className="flex gap-2 justify-end">
                   <Button
                     onClick={() => {
                       setIsCropping(false);
                       setImageSrc(null);
+                      setRotation(0);
                       setCurrentPhoto((prev) => ({ ...prev, file: undefined }));
                     }}
                     variant="outline"
@@ -375,8 +437,12 @@ export default function PhotoGalleryPage() {
             <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <Trash2 size={32} />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">फोटो हटवायचा?</h3>
-            <p className="text-gray-500 text-sm mb-6">हा फोटो कायमचा हटवला जाईल. आपण खात्रीशीर आहात का?</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              फोटो हटवायचा?
+            </h3>
+            <p className="text-gray-500 text-sm mb-6">
+              हा फोटो कायमचा हटवला जाईल. आपण खात्रीशीर आहात का?
+            </p>
             <div className="flex gap-3">
               <button
                 onClick={confirmDelete}

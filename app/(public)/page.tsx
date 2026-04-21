@@ -12,9 +12,9 @@ export default function Home() {
   return (
     <main className="min-h-screen relative">
       <Hero />
-      <div className="w-screen px-4 py-8 space-y-12">
+      <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 py-8 space-y-12 mx-auto max-w-7xl">
         {/* Full-width Officials + Departments */}
-        <div className="my-8 md:my-12 px-4 sm:px-8 md:px-20">
+        <div className="my-8 md:my-12">
           <Officials />
           <Dashboard />
           <ProjectsSection />

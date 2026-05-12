@@ -11,6 +11,7 @@ import {
   FileText,
   Hammer,
 } from "lucide-react";
+import Image from "next/image";
 import websiteAPI from "@/lib/api";
 import { formatMarathiNumber, replaceWithMarathiDigits } from "@/lib/utils";
 
@@ -23,11 +24,15 @@ interface Project {
   start_date: string;
   end_date: string;
   status: string;
+  image?: string;
+  image_url?: string;
 }
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const getProjectImage = (project: Project) => project.image || project.image_url || "";
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -112,47 +117,75 @@ export default function ProjectsPage() {
               <p className="text-gray-400 mt-2">कृपया लवकरच पुन्हा भेट द्या.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {projects.map((project) => (
                 <div
                   key={project.id}
-                  className="group overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-300 rounded-3xl bg-white flex flex-col h-full border border-gray-100"
+                  className="group overflow-hidden rounded-[2rem] bg-white flex flex-col h-full border border-slate-200 shadow-[0_18px_50px_rgba(15,23,42,0.08)] hover:shadow-[0_26px_70px_rgba(15,23,42,0.14)] transition-all duration-300"
                 >
-                  <div className="h-2 bg-[#0A1931] w-full transform origin-left group-hover:scale-x-105 transition-transform duration-500"></div>
-
-                  <div className="p-8 pb-4">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="bg-blue-50 p-3 rounded-2xl text-[#0A1931] group-hover:bg-[#0A1931] group-hover:text-white transition-colors duration-300">
-                        <Building2 size={24} />
+                  <div className="relative h-64 md:h-72 w-full overflow-hidden bg-slate-100">
+                    {getProjectImage(project) ? (
+                      <Image
+                        src={getProjectImage(project)}
+                        alt={project.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.18),_transparent_36%),linear-gradient(135deg,#eff6ff,#f8fafc_55%,#e2e8f0)] flex flex-col items-center justify-center text-slate-400">
+                        <Building2 className="h-16 w-16 mb-4 opacity-60" />
+                        <p className="text-sm font-semibold">छायाचित्र उपलब्ध नाही</p>
                       </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-900/15 to-transparent"></div>
+                    <div className="absolute left-5 top-5">
+                      <div className="inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-slate-700 shadow-sm backdrop-blur">
+                        {project.type || "प्रकल्प"}
+                      </div>
+                    </div>
+                    <div className="absolute right-5 top-5">
                       {getStatusBadge(project.status)}
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 line-clamp-2 leading-tight min-h-[4rem]">
-                      {replaceWithMarathiDigits(project.name)}
-                    </h3>
                   </div>
 
-                  <div className="p-8 pt-4 flex-1 space-y-6">
-                    <div className="space-y-4">
-                      <p className="text-gray-600 text-sm leading-relaxed italic line-clamp-3">
-                        {project.description}
-                      </p>
-
-                      <div className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-sm font-bold rounded-lg uppercase tracking-wider">
-                        {project.type}
+                  <div className="p-8 pb-5">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="bg-blue-50 p-3 rounded-2xl text-[#0A1931] group-hover:bg-[#0A1931] group-hover:text-white transition-colors duration-300 shrink-0">
+                        <Building2 size={24} />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-2xl font-bold text-slate-900 line-clamp-2 leading-tight">
+                          {replaceWithMarathiDigits(project.name)}
+                        </h3>
+                        <p className="text-slate-500 text-sm">
+                          {project.start_date
+                            ? formatDate(project.start_date)
+                            : "कालावधी नमूद नाही"}
+                          {project.end_date
+                            ? ` - ${formatDate(project.end_date)}`
+                            : ""}
+                        </p>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-50">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-green-50 p-2 rounded-xl text-green-600">
+                  <div className="p-8 pt-0 flex-1 flex flex-col">
+                    <div className="rounded-3xl bg-slate-50/90 border border-slate-100 px-5 py-4 mb-6">
+                      <p className="text-slate-600 text-sm leading-7 italic line-clamp-4 min-h-[7rem]">
+                        {project.description || "या प्रकल्पाचे वर्णन अद्याप उपलब्ध नाही."}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-slate-100 mt-auto">
+                      <div className="flex items-center gap-3 rounded-2xl bg-green-50/70 px-4 py-3">
+                        <div className="bg-white p-2 rounded-xl text-green-600 shadow-sm">
                           <IndianRupee size={18} />
                         </div>
                         <div>
-                          <p className="text-xs uppercase font-bold text-gray-400 tracking-widest">
+                          <p className="text-xs uppercase font-bold text-slate-400 tracking-widest">
                             अंदाजपत्रकीय खर्च
                           </p>
-                          <p className="font-extrabold text-gray-800 text-base">
+                          <p className="font-extrabold text-slate-800 text-base">
                             {project.cost
                               ? `₹${formatMarathiNumber(project.cost)}`
                               : "नमुद नाही"}
@@ -160,15 +193,15 @@ export default function ProjectsPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <div className="bg-orange-50 p-2 rounded-xl text-orange-600">
+                      <div className="flex items-center gap-3 rounded-2xl bg-orange-50/70 px-4 py-3">
+                        <div className="bg-white p-2 rounded-xl text-orange-600 shadow-sm">
                           <Calendar size={18} />
                         </div>
                         <div>
-                          <p className="text-xs uppercase font-bold text-gray-400 tracking-widest">
+                          <p className="text-xs uppercase font-bold text-slate-400 tracking-widest">
                             कालावधी
                           </p>
-                          <p className="font-bold text-gray-700 text-xs">
+                          <p className="font-bold text-slate-700 text-xs leading-5">
                             {formatDate(project.start_date)} -{" "}
                             {project.end_date
                               ? formatDate(project.end_date)

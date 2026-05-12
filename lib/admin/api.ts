@@ -1,6 +1,15 @@
 // API Configuration
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const resolveApiBaseUrl = () => {
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const normalizedUrl = configuredUrl.replace(/\/+$/, "");
+
+  return normalizedUrl.endsWith("/api")
+    ? normalizedUrl
+    : `${normalizedUrl}/api`;
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 // Helper function to get auth token
 const getAuthToken = (): string | null => {
@@ -38,7 +47,10 @@ const apiCall = async (endpoint: string, options: ApiOptions = {}) => {
       headers,
     });
 
-    const data = await response.json();
+    const contentType = response.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+      ? await response.json()
+      : { message: await response.text() };
 
     if (!response.ok) {
       throw new Error(data.message || "API request failed");
@@ -362,12 +374,22 @@ export const projectsAPI = {
   save: async (data: any) => {
     return apiCall("/projects", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
     });
   },
   delete: async (id: string) => {
     return apiCall(`/projects/${id}`, {
       method: "DELETE",
+    });
+  },
+  uploadImage: async (file: File, category = "projects") => {
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("category", category);
+
+    return apiCall("/projects/upload", {
+      method: "POST",
+      body: formData,
     });
   },
 };

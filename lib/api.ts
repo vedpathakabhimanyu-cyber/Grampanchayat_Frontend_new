@@ -1,7 +1,17 @@
 // API Configuration for Static Website
 import { requestCache } from './requestCache';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const resolveApiBaseUrl = () => {
+  const configuredUrl =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const normalizedUrl = configuredUrl.replace(/\/+$/, "");
+
+  return normalizedUrl.endsWith("/api")
+    ? normalizedUrl
+    : `${normalizedUrl}/api`;
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 // Helper function to make API calls with automatic caching
 const apiCall = async (endpoint: string, cacheTTL: number = 30 * 1000) => {
